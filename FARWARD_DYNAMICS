@@ -1,0 +1,50 @@
+clear all
+clc
+global m2 l2 g
+m2 = 1.5;
+l2 = 1.5;
+g = 9.81;
+time = 0:0.01:3;
+y0 = [0;0;0.5;0];
+[t,y] = ode45(@forwardDyn,time,y0);
+X2 = [];
+Y2 = [];
+Tao = [];
+Q_2dot = [];
+for i = 1:length(t)
+    x2 = y(i,3)*cos(y(i,1)-(pi/2));
+    X2 = [X2 x2];
+    x1 = -(l2 - y(i,3))*cos(y(i,1)-(pi/2));
+    y1 = -(l2 - y(i,3))*sin(y(i,1)-(pi/2));
+    y2 = y(i,3)*sin(y(i,1)-(pi/2));
+    Y2 = [Y2 y2];
+    figure(1)
+    plot([x1 x2],[y1 y2],X2(1,:),Y2(1,:))
+    axis equal
+    axis([-3 3 -2 3])
+    grid on
+    I = [m2*y(i,3)^2 0;0 m2 ];
+    C = [m2*y(i,3)*y(i,4) m2*y(i,3)*y(i,2);-m2*y(i,3)*y(i,2) 0];
+    h = [m2*y(i,3)*sin(y(i,1))*g;-m2*cos(y(i,1))*g];
+    tor = indyn(t(i));
+    %tor = [0;0];  % for free fall
+    k = tor-h-C*[y(i,2);y(i,4)];
+    q_2dot = inv(I)*k;
+    Q_2dot = [Q_2dot q_2dot];
+    Tao = [Tao tor];
+end
+figure(1)
+plot(t,Tao)
+legend('torqe','force')
+xlabel('time')
+ylabel('magnitude')
+figure(2)
+plot(t,y(:,1),t,y(:,2),t,Q_2dot(1,:)')
+legend('angular position','angular speed','angular acceleration')
+xlabel('time')
+ylabel('magnitude')
+figure(3)
+plot(t,y(:,3),t,y(:,4),t,Q_2dot(2,:)')
+legend('Linear position','Linear speed','Linear acceleration')
+xlabel('time')
+ylabel('magnitude')
