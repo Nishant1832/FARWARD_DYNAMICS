@@ -1,0 +1,16 @@
+function taao = indyn(t)
+q0  = [0;0.5];
+qT = [120*pi/180;1];
+T = 3;
+w = (qT - q0)/T;
+g = 9.81;
+m = 1.5;
+
+q = q0 + w.*(t-(T/(2*pi)).*sin(2*pi.*t./T));
+q_dot = w.*(1-cos(2*pi.*t./T));
+q_2dot = w.*((2*pi/T).*sin(2*pi.*t./T));
+I = [m.*q(2).^2 0 ; 0 m];
+C = [m*q(2)*q_dot(2) m*q(2)*q_dot(1);-m*q(2)*q_dot(1) 0];
+h = [m*q(2)*sin(q(1))*g;-m*cos(q(1))*g];
+taao = I*q_2dot + C*q_dot + h ;
+end
